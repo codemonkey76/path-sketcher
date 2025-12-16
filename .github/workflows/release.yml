@@ -38,7 +38,6 @@ jobs:
 
       - name: Build for sketch for ${{ matrix.target }}
         run: |
-          cd path-sketcher
           if [ "${{ matrix.target }}" == "x86_64-linux" ]; then
             zig build -Doptimize=ReleaseSmall
           else
@@ -49,9 +48,9 @@ jobs:
         run: |
           mkdir -p releases
           if [ "${{ matrix.target }}" == "x86_64-windows" ]; then
-            cp sketch/zig-out/bin/sketch.exe releases/${{ matrix.sketch_artifact }}
+            cp zig-out/bin/sketch.exe releases/${{ matrix.sketch_artifact }}
           else
-            cp sketch/zig-out/bin/sketch releases/${{ matrix.sketch_artifact }}
+            cp zig-out/bin/sketch releases/${{ matrix.sketch_artifact }}
           fi
 
       - name: Upload sketch artifact
