@@ -1,0 +1,80 @@
+name: Build Release
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-linux
+            sketch_artifact: sketch-linux-x64
+          - os: ubuntu-latest
+            target: x86_64-windows
+            sketch_artifact: sketch-windows-x64.exe
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Linux dependencies
+        if: matrix.target == 'x86_64-linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev \
+            libxi-dev libglx-dev libgl1-mesa-dev pkg-config
+
+      - name: Setup Zig
+        uses: goto-bus-stop/setup-zig@v2
+        with:
+          version: 0.15.2
+
+      - name: Build for sketch for ${{ matrix.target }}
+        run: |
+          cd sketch
+          if [ "${{ matrix.target }}" == "x86_64-linux" ]; then
+            zig build -Doptimize=ReleaseSmall
+          else
+            zig build -Doptimize=ReleaseSmall -Dtarget=${{ matrix.target }}
+          fi
+
+      - name: Package sketch
+        run: |
+          mkdir -p releases
+          if [ "${{ matrix.target }}" == "x86_64-windows" ]; then
+            cp sketch/zig-out/bin/sketch.exe releases/${{ matrix.sketch_artifact }}
+          else
+            cp sketch/zig-out/bin/sketch releases/${{ matrix.sketch_artifact }}
+          fi
+
+      - name: Upload sketch artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.sketch_artifact }}
+          path: releases/${{ matrix.sketch_artifact }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: releases
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: releases/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
