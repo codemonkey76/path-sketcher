@@ -38,7 +38,7 @@ jobs:
 
       - name: Build for sketch for ${{ matrix.target }}
         run: |
-          cd sketch
+          cd path-sketcher
           if [ "${{ matrix.target }}" == "x86_64-linux" ]; then
             zig build -Doptimize=ReleaseSmall
           else
