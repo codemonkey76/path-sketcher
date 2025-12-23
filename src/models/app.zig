@@ -236,8 +236,8 @@ pub const AppModel = struct {
                 .{
                     .pad = 10.0 * self.scale_factor,
                     .font_px = 18.0 * self.scale_factor,
-                    .viewport_w = 224 * self.scale_factor,
-                    .viewport_h = 288 * self.scale_factor,
+                    .viewport_w = 207 * self.scale_factor,
+                    .viewport_h = 282 * self.scale_factor,
                     .viewport_margin = 40 * self.scale_factor,
                     .point_radius = 7.0 * self.scale_factor,
                     .hit_radius = 10.0 * self.scale_factor,

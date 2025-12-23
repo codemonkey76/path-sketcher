@@ -28,8 +28,8 @@ pub const Params = struct {
     pad: f32 = 10.0,
     font_px: f32 = 18.0,
 
-    viewport_w: f32 = 224,
-    viewport_h: f32 = 288,
+    viewport_w: f32 = 207,
+    viewport_h: f32 = 282,
     viewport_margin: f32 = 40,
 
     point_radius: f32 = 7.0,
